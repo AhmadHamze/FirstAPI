@@ -1,3 +1,10 @@
+var words = {
+    agree: 1,
+    disagree: -1,
+    good: 2,
+    bad: -2
+}
+
 // First import express, it can be assigned to a variable because
 //the whole express package is actually a function
 var express = require('express');
@@ -38,3 +45,18 @@ app.get('/search/:object/:num', (req, res)=>{
     }
     res.send(reply); //send back this 'reply'
 } )
+
+//Sending a js object in express will be automatically transformed into a JSON
+app.get('/words', (req, res)=>{
+    res.send(words)
+})
+
+//This will work on postman, but in order to see it in the browser you have to use 'get'
+//At this point whenever you restart the server, all added words are gone because they were
+//never saved.
+app.post('/add/:neword/:val', (req, res)=>{
+    word = req.params.neword;
+    value = req.params.val;
+    words[word] = parseInt(value, 10);
+    res.send(`Successfully added ${word}:${value}`)
+})
