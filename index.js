@@ -1,20 +1,32 @@
-var words = {
-    agree: 1,
-    disagree: -1,
-    good: 2,
-    bad: -2
-}
 
 // First import express, it can be assigned to a variable because
 //the whole express package is actually a function
-var express = require('express');
+const express = require('express');
 
 // Listening for incoming connections
-var app = express();
+const app = express();
 
 // Listening at port 3000, and using a callback function to state that
 // the operation is working fine
-var server = app.listen(3000, () => {console.log('listening to port 3000...');});
+const server = app.listen(3000, () => {console.log('listening to port 3000...');});
+
+// Importing the file system module from node
+const fs = require('fs');
+
+// 'data' is the content of the 'data.json' file, which is actually in a read in it's raw form.
+// This data has to be parsed in order to become in json form
+/*
+// SYNC vs NO SYNC
+What is the difference between 'readFile' and 'readFileSync'?
+You can think of syncronous as being a 'blocking' line of code.
+When you use the sync version, the next line of code won't start until
+the sync operation has ended. This is what we ususally want when reading the contents of a file,
+this also saves you from adding a callback.
+However, if you want to perform read and write actions while the user is making an api request,
+you should not use the sync version because it will lock up the server. 
+*/
+var data = fs.readFileSync('data/data.json');
+var words = JSON.parse(data);
 
 // Express has the ability to host static files, e.g. HTML, images, movies, etc..
 // Note that 'website' is the folder where the static files are fetched,
@@ -24,7 +36,7 @@ app.use(express.static('website'));
 // RESTful API //
 /*
 It stands for Representational State Transfer, it is a software architectural style.
-It defined how users can make requests and send responses to the API.
+It defines how users can make requests and send responses to the API.
 Instead of having directories in your code to allow the navigation of the site,
 you can navigate using routes.
 In the following example you can see a get request that links to a 'search' route.
@@ -46,17 +58,23 @@ app.get('/search/:object/:num', (req, res)=>{
     res.send(reply); //send back this 'reply'
 } )
 
-//Sending a js object in express will be automatically transformed into a JSON
+// Sending a js object in express will be automatically transformed into a JSON
 app.get('/words', (req, res)=>{
-    res.send(words)
+    res.send(words);
 })
 
-//This will work on postman, but in order to see it in the browser you have to use 'get'
-//At this point whenever you restart the server, all added words are gone because they were
-//never saved.
+// This will work on postman, but in order to see it in the browser you have to use 'get'
+// Beware that 'writeFile' is actually deleting the contents and rewriting it.
+// We are using the async version, no need for sync here but we have a callback.
 app.post('/add/:neword/:val', (req, res)=>{
-    word = req.params.neword;
-    value = req.params.val;
+    const word = req.params.neword;
+    const value = req.params.val;
     words[word] = parseInt(value, 10);
+    const data = JSON.stringify(words, null, 2);
+    fs.writeFile('data/data.json', data, (err)=>{
+        if(err) throw err;
+        console.log('Writing to file...');
+    });
     res.send(`Successfully added ${word}:${value}`)
+
 })

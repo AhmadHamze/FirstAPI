@@ -1,0 +1,10 @@
+{
+  "agree": 1,
+  "disagree": -1,
+  "good": 2,
+  "bad": -2,
+  "amazing": 4,
+  "horrible": -4,
+  "bizarre": -2,
+  "angry": -3
+}
