@@ -1,6 +1,6 @@
 
 // First import express, it can be assigned to a variable because
-//the whole express package is actually a function
+// the whole express package is actually a function
 const express = require('express');
 
 // Listening for incoming connections
@@ -13,7 +13,7 @@ const server = app.listen(3000, () => {console.log('listening to port 3000...');
 // Importing the file system module from node
 const fs = require('fs');
 
-// 'data' is the content of the 'data.json' file, which is actually in a read in it's raw form.
+// 'data' is the content of the 'data.json' file, which is actually read in it's raw form.
 // This data has to be parsed in order to become in json form
 /*
 // SYNC vs NO SYNC
@@ -44,18 +44,24 @@ Then there is a callback function with two parameters (request and response).
 Whenever a user interacts with a website, the user is making a 'request' to the server,
 which in turn sends back a response.
 The ':object' signify that in the 'search' route, the user can enter a variable,
-':num' is another variable. Notice that data will be displayed on the web page
-despite that there is no html file to render it!
+':num' is another variable, the '?' signifies that this parameter is optional.
+Notice that data will be displayed on the web page despite that there is no html file to render it!
 */
-app.get('/search/:object/:num', (req, res)=>{
-    var data = req.params; //'object' is a parameter for the request
-    var num = data.num; //'num' has to be reached this way, req.params.num
+app.get('/search/:object/:num?', (req, res)=>{
+    var object = req.params.object; //'object' is a parameter for the request
+    var num = req.params.num; //parameters has to be reached this way, 'req.params.num'
     var reply = "";
-    for(var i=0; i<num; i++)
-    {
-        reply += `${data.object} is found`;
+    if(!num) {
+        reply = `${object} is found, no num was given`;
+        res.send(reply);
     }
+    else {
+        for(var i=0; i<num; i++)
+        {
+            reply += `${object} is found`;
+        }
     res.send(reply); //send back this 'reply'
+    }
 } )
 
 // Sending a js object in express will be automatically transformed into a JSON
@@ -76,5 +82,4 @@ app.post('/add/:neword/:val', (req, res)=>{
         console.log('Writing to file...');
     });
     res.send(`Successfully added ${word}:${value}`)
-
 })
